@@ -144,9 +144,111 @@
             display: block;
             animation: screenIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .screen.exit-zoom {
+            animation: screenExitZoom 0.7s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+        }
         @keyframes screenIn {
             from { opacity: 0; transform: translateY(40px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes screenExitZoom {
+            0% { opacity: 1; transform: scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: scale(1.3); filter: blur(8px); }
+        }
+
+        /* ===== DRAMATIC TRANSITION OVERLAY ===== */
+        #transition-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 80;
+            pointer-events: none;
+            display: none;
+        }
+        #transition-overlay.active { display: block; }
+
+        /* Heart wipe between captchas */
+        #transition-overlay.heart-wipe {
+            background: radial-gradient(circle at center, #ff4d6d, #c9184a, #0a0005);
+            animation: heartWipeTransition 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes heartWipeTransition {
+            0% { clip-path: circle(0% at 50% 50%); opacity: 1; }
+            45% { clip-path: circle(100% at 50% 50%); opacity: 1; }
+            55% { clip-path: circle(100% at 50% 50%); opacity: 1; }
+            100% { clip-path: circle(100% at 50% 50%); opacity: 0; }
+        }
+
+        /* Stage counter between captchas */
+        .transition-stage {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 81;
+            text-align: center;
+            display: none;
+        }
+        .transition-stage.active { display: block; }
+        .transition-stage .stage-emoji {
+            font-size: 80px;
+            display: block;
+            animation: stageEmojiBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes stageEmojiBounce {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            60% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        .transition-stage .stage-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.6rem;
+            color: #fff;
+            margin-top: 15px;
+            opacity: 0;
+            animation: fadeUp 0.5s ease 0.3s forwards;
+            text-shadow: 0 0 30px rgba(255,77,109,0.6);
+        }
+        .transition-stage .stage-sub {
+            font-size: 1rem;
+            color: #ff9eb8;
+            margin-top: 8px;
+            opacity: 0;
+            animation: fadeUp 0.4s ease 0.5s forwards;
+        }
+
+        /* Golden curtain for love letter → reveal */
+        #transition-overlay.golden-reveal {
+            background: linear-gradient(135deg, #ffb347, #ff6b9d, #ff4d6d, #c9184a);
+            background-size: 400% 400%;
+            animation: goldenReveal 2s ease forwards, gradientShift 2s ease infinite;
+        }
+        @keyframes goldenReveal {
+            0% { opacity: 0; transform: scale(1.5); filter: blur(30px); }
+            30% { opacity: 1; transform: scale(1.1); filter: blur(5px); }
+            50% { opacity: 1; transform: scale(1); filter: blur(0); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); }
+        }
+
+        /* White flash for big moments */
+        #transition-overlay.white-flash {
+            background: #fff;
+            animation: whiteFlash 0.8s ease forwards;
+        }
+        @keyframes whiteFlash {
+            0% { opacity: 0; }
+            15% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        /* Landing exit */
+        .screen.exit-spiral {
+            animation: screenExitSpiral 0.8s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+        }
+        @keyframes screenExitSpiral {
+            0% { opacity: 1; transform: scale(1) rotate(0); }
+            100% { opacity: 0; transform: scale(0.3) rotate(15deg); filter: blur(10px); }
         }
 
         /* ===== LANDING ===== */
@@ -380,12 +482,53 @@
         .success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 50; display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
             pointer-events: none; opacity: 0;
         }
-        .success-overlay.active { opacity: 1; animation: successFlash 1.2s ease forwards; }
-        .success-overlay .success-icon { font-size: 100px; animation: successPop 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); }
-        @keyframes successFlash { 0%{background:transparent} 20%{background:rgba(255,77,109,0.15)} 100%{background:transparent;opacity:0} }
-        @keyframes successPop { 0%{transform:scale(0) rotate(-20deg)} 60%{transform:scale(1.4) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
+        .success-overlay.active {
+            opacity: 1;
+            animation: successFlash 1.8s ease forwards;
+        }
+        .success-overlay .success-icon {
+            font-size: 120px;
+            animation: successPop 0.8s cubic-bezier(0.68,-0.55,0.265,1.55);
+            filter: drop-shadow(0 0 40px rgba(255,77,109,0.6));
+        }
+        .success-overlay .success-msg {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: #fff;
+            margin-top: 15px;
+            opacity: 0;
+            text-shadow: 0 0 20px rgba(255,77,109,0.5);
+            animation: fadeUp 0.5s ease 0.4s forwards;
+        }
+        @keyframes successFlash {
+            0% { background: transparent; }
+            15% { background: rgba(255,77,109,0.25); }
+            30% { background: rgba(255,77,109,0.08); }
+            100% { background: transparent; opacity: 0; }
+        }
+        @keyframes successPop {
+            0% { transform: scale(0) rotate(-30deg); }
+            50% { transform: scale(1.6) rotate(8deg); }
+            70% { transform: scale(0.9) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        /* Shockwave ring on success */
+        .success-shockwave {
+            position: absolute;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,77,109,0.6);
+            animation: shockwave 1s ease-out forwards;
+        }
+        @keyframes shockwave {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(15); opacity: 0; }
+        }
 
         /* ===== REVEAL ===== */
         .reveal { text-align: center; }
@@ -589,12 +732,14 @@
             flex-direction: column;
         }
         #password-gate.unlocked {
-            animation: gateUnlock 1.2s ease forwards;
+            animation: gateShatter 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        @keyframes gateUnlock {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
-            100% { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        @keyframes gateShatter {
+            0% { opacity: 1; transform: scale(1); filter: brightness(1); }
+            20% { opacity: 1; transform: scale(1.02); filter: brightness(2.5); }
+            40% { opacity: 1; transform: scale(1.08); filter: brightness(1.5) blur(2px); }
+            70% { opacity: 0.5; transform: scale(1.15) rotate(2deg); filter: blur(6px); }
+            100% { opacity: 0; transform: scale(1.3) rotate(5deg); filter: blur(15px); pointer-events: none; }
         }
         .pw-lock { font-size: 70px; margin-bottom: 20px; animation: lockPulse 2s ease-in-out infinite; }
         @keyframes lockPulse {
@@ -706,7 +851,12 @@
         }
         #luna-reveal.active { display: flex; }
         #luna-reveal.fade-out {
-            animation: introFadeOut 1.2s ease forwards;
+            animation: lunaExit 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        @keyframes lunaExit {
+            0% { opacity: 1; filter: blur(0); transform: scale(1); }
+            40% { opacity: 1; filter: blur(0); transform: scale(1.05); }
+            100% { opacity: 0; filter: blur(20px); transform: scale(1.4); }
         }
         .luna-img {
             width: 220px;
@@ -717,10 +867,30 @@
             box-shadow: 0 0 50px rgba(255,77,109,0.3), 0 0 100px rgba(255,77,109,0.1);
             opacity: 0;
             animation: lunaAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            position: relative;
+        }
+        /* Pulsing ring around Luna */
+        .luna-ring {
+            position: absolute;
+            width: 260px; height: 260px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,77,109,0.3);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: lunaRingPulse 2s ease-in-out infinite 1.5s;
+            opacity: 0;
+        }
+        .luna-ring:nth-child(2) { width: 300px; height: 300px; animation-delay: 1.8s; }
+        .luna-ring:nth-child(3) { width: 340px; height: 340px; animation-delay: 2.1s; }
+        @keyframes lunaRingPulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            50% { opacity: 0.6; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
         }
         @keyframes lunaAppear {
-            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
-            60% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+            0% { opacity: 0; transform: scale(0) rotate(-20deg); }
+            50% { opacity: 1; transform: scale(1.15) rotate(5deg); }
+            70% { transform: scale(0.95) rotate(-2deg); }
             100% { opacity: 1; transform: scale(1) rotate(0); }
         }
         .luna-name {
@@ -834,7 +1004,12 @@
 
     <!-- ===== LUNA REVEAL ===== -->
     <div id="luna-reveal">
-        <img src="LUNA.jpeg" alt="Luna" class="luna-img">
+        <div style="position:relative;display:flex;align-items:center;justify-content:center">
+            <div class="luna-ring"></div>
+            <div class="luna-ring"></div>
+            <div class="luna-ring"></div>
+            <img src="LUNA.jpeg" alt="Luna" class="luna-img">
+        </div>
         <div class="luna-name">!Luna 🐾</div>
         <div class="luna-subtitle">...הסיסמה נכונה, היא אישרה</div>
         <div class="luna-paw">🐕</div>
@@ -959,7 +1134,15 @@
 
     <!-- Overlays -->
     <div class="success-overlay" id="successOverlay">
+        <div class="success-shockwave" id="successShockwave"></div>
         <span class="success-icon" id="successIcon"></span>
+        <div class="success-msg" id="successMsg"></div>
+    </div>
+    <div id="transition-overlay"></div>
+    <div class="transition-stage" id="transitionStage">
+        <span class="stage-emoji" id="stageEmoji"></span>
+        <div class="stage-text" id="stageText"></div>
+        <div class="stage-sub" id="stageSub"></div>
     </div>
     <div class="confetti-container" id="confettiContainer"></div>
 
@@ -980,14 +1163,18 @@
         function checkPassword() {
             const val = pwInput.value.trim().toLowerCase();
             if (val === 'luna') {
-                // Correct! Unlock the gate and show Luna
+                // Correct! Dramatic shatter unlock + show Luna
                 const gate = document.getElementById('password-gate');
                 document.querySelector('.pw-lock').textContent = '🔓';
-                gate.classList.add('unlocked');
+
+                // Brief pause to let the lock emoji register, then shatter
                 setTimeout(() => {
-                    gate.style.display = 'none';
-                    showLunaReveal();
-                }, 1200);
+                    gate.classList.add('unlocked');
+                    setTimeout(() => {
+                        gate.style.display = 'none';
+                        showLunaReveal();
+                    }, 1500);
+                }, 400);
             } else {
                 // Wrong password
                 pwInput.classList.add('wrong-pw');
@@ -1219,7 +1406,70 @@
             document.getElementById(id).classList.add('active');
             window.scrollTo({top:0,behavior:'smooth'});
         }
-        function startGame() { buildGrid(1); showScreen('screen-captcha1'); }
+
+        // Dramatic transition between screens
+        function dramaticTransition(fromId, toId, type, callback) {
+            const from = document.getElementById(fromId);
+            const overlay = document.getElementById('transition-overlay');
+
+            if (type === 'spiral') {
+                // Landing exit — spiral shrink
+                from.classList.add('exit-spiral');
+                fireTransitionOverlay('white-flash');
+                setTimeout(() => {
+                    from.classList.remove('active', 'exit-spiral');
+                    document.getElementById(toId).classList.add('active');
+                    if (callback) callback();
+                }, 600);
+            } else if (type === 'heart-wipe') {
+                // Between captchas — heart wipe with stage display
+                from.classList.add('exit-zoom');
+                fireTransitionOverlay('heart-wipe');
+                setTimeout(() => {
+                    from.classList.remove('active', 'exit-zoom');
+                    document.getElementById(toId).classList.add('active');
+                    if (callback) callback();
+                }, 800);
+            } else if (type === 'golden') {
+                // Love letter → reveal
+                fireTransitionOverlay('golden-reveal');
+                setTimeout(() => {
+                    document.getElementById(toId).classList.add('active');
+                    if (callback) callback();
+                }, 800);
+            }
+        }
+
+        function fireTransitionOverlay(type) {
+            const overlay = document.getElementById('transition-overlay');
+            overlay.className = '';
+            overlay.classList.add('active', type);
+            const dur = type === 'golden-reveal' ? 2000 : type === 'heart-wipe' ? 1400 : 800;
+            setTimeout(() => { overlay.className = ''; }, dur);
+        }
+
+        // Show stage announcement between captchas
+        function showStageAnnouncement(emoji, text, sub, duration) {
+            const stage = document.getElementById('transitionStage');
+            document.getElementById('stageEmoji').textContent = emoji;
+            document.getElementById('stageText').textContent = text;
+            document.getElementById('stageSub').textContent = sub;
+            stage.className = 'transition-stage active';
+            // Reset animations
+            document.getElementById('stageEmoji').style.animation = 'none';
+            document.getElementById('stageText').style.animation = 'none';
+            document.getElementById('stageSub').style.animation = 'none';
+            void stage.offsetHeight;
+            document.getElementById('stageEmoji').style.animation = '';
+            document.getElementById('stageText').style.animation = '';
+            document.getElementById('stageSub').style.animation = '';
+            setTimeout(() => { stage.className = 'transition-stage'; }, duration || 1200);
+        }
+
+        function startGame() {
+            buildGrid(1);
+            dramaticTransition('screen-landing', 'screen-captcha1', 'spiral');
+        }
 
         // ============================================
         // VERIFY
@@ -1240,15 +1490,32 @@
                 errorEl.classList.remove('show');
                 // Flash correct
                 cells.forEach(c => { if(c.dataset.correct==='true') c.classList.add('correct-flash'); });
-                // Success overlay with message
+
+                // Dramatic success overlay with shockwave + message
                 const overlay = document.getElementById('successOverlay');
                 const icon = document.getElementById('successIcon');
+                const msg = document.getElementById('successMsg');
+                const shockwave = document.getElementById('successShockwave');
+
                 icon.textContent = captchaData[num].successEmoji;
+                msg.textContent = captchaData[num].successMsg;
+
+                // Reset shockwave
+                shockwave.style.animation = 'none';
+                void shockwave.offsetHeight;
+                shockwave.style.animation = '';
+
+                // Reset msg animation
+                msg.style.animation = 'none';
+                void msg.offsetHeight;
+                msg.style.animation = '';
+
                 overlay.classList.add('active');
+
                 setTimeout(() => {
                     overlay.classList.remove('active');
                     onCaptchaSuccess(num);
-                }, 1200);
+                }, 1800);
             } else {
                 // Shake
                 const box = grid.closest('.captcha-box');
@@ -1271,13 +1538,30 @@
             }
         }
 
+        const stageData = {
+            1: { emoji: '🔥', text: '!שלב 1 הושלם', sub: '...עכשיו תמצאי את עצמך' },
+            2: { emoji: '💃', text: '!שלב 2 הושלם', sub: '...נשאר רק עוד אחד' },
+            3: { emoji: '🎉', text: '!כל השלבים הושלמו', sub: '...יש לי משהו בשבילך' }
+        };
+
         function onCaptchaSuccess(num) {
             if (num < 3) {
+                const sd = stageData[num];
+                // Show stage announcement during heart-wipe transition
+                showStageAnnouncement(sd.emoji, sd.text, sd.sub, 1600);
                 buildGrid(num+1);
-                showScreen('screen-captcha'+(num+1));
+                setTimeout(() => {
+                    dramaticTransition('screen-captcha'+num, 'screen-captcha'+(num+1), 'heart-wipe');
+                }, 200);
             } else {
-                // Show love letter transition before reveal
-                showLoveLetter();
+                // Final captcha done — dramatic buildup
+                const sd = stageData[3];
+                showStageAnnouncement(sd.emoji, sd.text, sd.sub, 2000);
+                fireTransitionOverlay('white-flash');
+                setTimeout(() => {
+                    document.getElementById('screen-captcha3').classList.remove('active');
+                    showLoveLetter();
+                }, 1800);
             }
         }
 
@@ -1344,16 +1628,24 @@
             const overlay = document.getElementById('loveLetterOverlay');
             overlay.style.transition = 'opacity 1s ease';
             overlay.style.opacity = '0';
+
+            // Golden curtain reveal transition
             setTimeout(() => {
                 overlay.classList.remove('active');
                 overlay.style.opacity = '';
                 overlay.style.transition = '';
+                fireTransitionOverlay('golden-reveal');
+            }, 800);
+
+            // Show reveal screen after golden curtain peaks
+            setTimeout(() => {
                 showScreen('screen-reveal');
+                fireTransitionOverlay('white-flash');
                 launchConfetti();
                 launchFireworks();
                 animateGallery();
                 setTimeout(() => playVoiceMessage(), 2500);
-            }, 1000);
+            }, 1800);
         }
 
         // ============================================
