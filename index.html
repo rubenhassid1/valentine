@@ -25,7 +25,7 @@
             width: 100%; height: 100%;
             background: #000;
             z-index: 9999;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
@@ -576,6 +576,232 @@
             70%{transform:translateX(-2px)}
         }
 
+        /* ===== PASSWORD GATE ===== */
+        #password-gate {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0a0005;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #password-gate.unlocked {
+            animation: gateUnlock 1.2s ease forwards;
+        }
+        @keyframes gateUnlock {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        }
+        .pw-lock { font-size: 70px; margin-bottom: 20px; animation: lockPulse 2s ease-in-out infinite; }
+        @keyframes lockPulse {
+            0%,100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255,77,109,0.3)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(255,77,109,0.6)); }
+        }
+        .pw-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: #ff9eb8;
+            margin-bottom: 25px;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.8;
+        }
+        .pw-input-wrap {
+            position: relative;
+            width: 280px;
+        }
+        .pw-input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            font-family: 'Heebo', sans-serif;
+            background: rgba(255,77,109,0.08);
+            border: 1px solid rgba(255,77,109,0.25);
+            border-radius: 14px;
+            color: #fff;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 3px;
+        }
+        .pw-input::placeholder {
+            color: rgba(255,158,184,0.4);
+            letter-spacing: 1px;
+        }
+        .pw-input:focus {
+            border-color: #ff4d6d;
+            box-shadow: 0 0 25px rgba(255,77,109,0.2);
+            background: rgba(255,77,109,0.12);
+        }
+        .pw-input.wrong-pw {
+            animation: pwShake 0.5s ease;
+            border-color: #ff2d2d;
+        }
+        @keyframes pwShake {
+            0%,100%{transform:translateX(0)} 15%{transform:translateX(-10px)}
+            30%{transform:translateX(10px)} 45%{transform:translateX(-6px)}
+            60%{transform:translateX(6px)} 75%{transform:translateX(-3px)}
+        }
+        .pw-submit {
+            margin-top: 15px;
+            background: linear-gradient(135deg, #ff4d6d, #c9184a);
+            color: white; border: none;
+            padding: 12px 40px;
+            font-size: 1rem; font-family: 'Heebo', sans-serif; font-weight: 700;
+            border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255,77,109,0.3);
+        }
+        .pw-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255,77,109,0.5);
+        }
+        .pw-hint {
+            margin-top: 20px;
+            color: rgba(255,158,184,0.3);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .pw-hint:hover { color: rgba(255,158,184,0.6); }
+        .pw-hint-text {
+            margin-top: 10px;
+            color: #ff9eb8;
+            font-size: 0.95rem;
+            font-style: italic;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        .pw-hint-text.show {
+            opacity: 1;
+            max-height: 50px;
+        }
+        .pw-error {
+            margin-top: 12px;
+            color: #ff6b81;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .pw-error.show { opacity: 1; }
+
+        /* ===== LUNA REVEAL ===== */
+        #luna-reveal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #0a0005;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #luna-reveal.active { display: flex; }
+        #luna-reveal.fade-out {
+            animation: introFadeOut 1.2s ease forwards;
+        }
+        .luna-img {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255,77,109,0.4);
+            box-shadow: 0 0 50px rgba(255,77,109,0.3), 0 0 100px rgba(255,77,109,0.1);
+            opacity: 0;
+            animation: lunaAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+        }
+        @keyframes lunaAppear {
+            0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+            60% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        .luna-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #ff9eb8;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 1s forwards;
+        }
+        .luna-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: rgba(255,158,184,0.6);
+            margin-top: 8px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 1.4s forwards;
+        }
+        .luna-paw {
+            font-size: 40px;
+            margin-top: 15px;
+            opacity: 0;
+            animation: fadeUp 0.6s ease 1.8s forwards;
+        }
+
+        /* ===== FINAL TOUCH GALLERY ===== */
+        .final-gallery {
+            margin-top: 30px;
+            width: 100%;
+            opacity: 0;
+            animation: fadeUp 1s ease 2.8s forwards;
+        }
+        .final-gallery-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #ff9eb8;
+            margin-bottom: 18px;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border: 2px solid rgba(255,77,109,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 20px rgba(255,77,109,0.05);
+            opacity: 0;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03) translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 30px rgba(255,77,109,0.15);
+            border-color: rgba(255,77,109,0.5);
+        }
+        .gallery-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+        .gallery-item:hover img { transform: scale(1.08); }
+        .gallery-item.visible {
+            animation: galleryPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes galleryPop {
+            from { opacity: 0; transform: scale(0.7) rotate(-3deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        /* Make the first item span full width for visual interest */
+        .gallery-item.wide {
+            grid-column: span 2;
+            aspect-ratio: 16/9;
+        }
+
         /* ===== MOBILE ===== */
         @media (max-width: 480px) {
             .landing h1 { font-size: 2.5rem; }
@@ -585,15 +811,40 @@
             .restaurant-card { padding: 22px; }
             .intro-text { font-size: 1.1rem; }
             .restaurant-card .time { font-size: 2rem; }
+            .luna-img { width: 170px; height: 170px; }
+            .luna-name { font-size: 2rem; }
+            .gallery-grid { gap: 8px; }
+            .final-gallery-title { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
+    <!-- ===== PASSWORD GATE ===== -->
+    <div id="password-gate">
+        <div class="pw-lock">🔒</div>
+        <div class="pw-title">הכניסה מוגנת.<br>רק מיכל האמיתית יכולה להיכנס.</div>
+        <div class="pw-input-wrap">
+            <input type="text" class="pw-input" id="pwInput" placeholder="הקלידי את הסיסמה..." autocomplete="off" autocapitalize="none">
+        </div>
+        <button class="pw-submit" onclick="checkPassword()">כניסה</button>
+        <div class="pw-hint" onclick="toggleHint()">💡 רמז</div>
+        <div class="pw-hint-text" id="pwHint">הבחורה היחידה שיכולה לנשק אותי בלי שתהיי מקנאה</div>
+        <div class="pw-error" id="pwError">!סיסמה לא נכונה, נסי שוב</div>
+    </div>
+
+    <!-- ===== LUNA REVEAL ===== -->
+    <div id="luna-reveal">
+        <img src="LUNA.jpeg" alt="Luna" class="luna-img">
+        <div class="luna-name">!Luna 🐾</div>
+        <div class="luna-subtitle">...הסיסמה נכונה, היא אישרה</div>
+        <div class="luna-paw">🐕</div>
+    </div>
+
     <!-- ===== CINEMATIC INTRO ===== -->
     <div id="cinematic-intro">
-        <div class="intro-text" id="introText1">A love story in 3 captchas...</div>
+        <div class="intro-text" id="introText1">...אני לא בטוח שהחברה שלי בכלל בן אדם</div>
         <div class="intro-heart-line" id="introLine"></div>
-        <div class="intro-text" id="introText2" style="margin-top:0">Ruben & Michal</div>
+        <div class="intro-text" id="introText2" style="margin-top:0">אז היא תצטרך להוכיח את זה</div>
     </div>
 
     <!-- Ambient -->
@@ -684,6 +935,15 @@
                 <span class="btn-text">&#127911; הקשיבי להודעה</span>
             </button>
             <div class="audio-visualizer" id="audioVisualizer"></div>
+            <div class="final-gallery" id="finalGallery">
+                <div class="final-gallery-title">💕 הרגעים שלנו 💕</div>
+                <div class="gallery-grid" id="galleryGrid">
+                    <div class="gallery-item wide"><img src="FINAL TOUCH/WhatsApp Image 2026-02-07 at 16.42.08.jpeg" alt="" draggable="false"></div>
+                    <div class="gallery-item"><img src="FINAL TOUCH/WhatsApp Image 2026-01-25 at 20.19.49.jpeg" alt="" draggable="false"></div>
+                    <div class="gallery-item"><img src="FINAL TOUCH/WhatsApp Image 2026-01-24 at 07.07.16.jpeg" alt="" draggable="false"></div>
+                    <div class="gallery-item wide"><img src="FINAL TOUCH/WhatsApp Image 2026-01-31 at 17.44.45.jpeg" alt="" draggable="false"></div>
+                </div>
+            </div>
             <div class="final-heart">&#10084;&#65039;</div>
         </div>
     </div>
@@ -712,10 +972,61 @@
         const VOICE_MESSAGE = "Hi, I'm Claude. Ruben's ex. He said you're the new girlfriend, and I now have to let you have him. So he made me say this to you: you are invited for a Valentine's Day dinner. I'm a bit jealous. Take care of him.";
 
         // ============================================
+        // PASSWORD GATE
+        // ============================================
+        const pwInput = document.getElementById('pwInput');
+        pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+        function checkPassword() {
+            const val = pwInput.value.trim().toLowerCase();
+            if (val === 'luna') {
+                // Correct! Unlock the gate and show Luna
+                const gate = document.getElementById('password-gate');
+                document.querySelector('.pw-lock').textContent = '🔓';
+                gate.classList.add('unlocked');
+                setTimeout(() => {
+                    gate.style.display = 'none';
+                    showLunaReveal();
+                }, 1200);
+            } else {
+                // Wrong password
+                pwInput.classList.add('wrong-pw');
+                const err = document.getElementById('pwError');
+                err.classList.add('show');
+                setTimeout(() => {
+                    pwInput.classList.remove('wrong-pw');
+                }, 500);
+                pwInput.value = '';
+                pwInput.focus();
+            }
+        }
+
+        function toggleHint() {
+            document.getElementById('pwHint').classList.toggle('show');
+        }
+
+        // ============================================
+        // LUNA REVEAL
+        // ============================================
+        function showLunaReveal() {
+            const lunaReveal = document.getElementById('luna-reveal');
+            lunaReveal.classList.add('active');
+            // Show Luna for 3.5 seconds then fade to cinematic intro
+            setTimeout(() => {
+                lunaReveal.classList.add('fade-out');
+                setTimeout(() => {
+                    lunaReveal.style.display = 'none';
+                    startCinematicIntro();
+                }, 1200);
+            }, 3500);
+        }
+
+        // ============================================
         // CINEMATIC INTRO SEQUENCE
         // ============================================
-        (function() {
+        function startCinematicIntro() {
             const intro = document.getElementById('cinematic-intro');
+            intro.style.display = 'flex';
             const t1 = document.getElementById('introText1');
             const line = document.getElementById('introLine');
             const t2 = document.getElementById('introText2');
@@ -731,7 +1042,7 @@
                 intro.classList.add('fade-out');
                 setTimeout(() => intro.style.display = 'none', 1500);
             }, 5500);
-        })();
+        }
 
         // ============================================
         // CURSOR TRAIL
@@ -1040,8 +1351,21 @@
                 showScreen('screen-reveal');
                 launchConfetti();
                 launchFireworks();
+                animateGallery();
                 setTimeout(() => playVoiceMessage(), 2500);
             }, 1000);
+        }
+
+        // ============================================
+        // GALLERY ANIMATION
+        // ============================================
+        function animateGallery() {
+            const items = document.querySelectorAll('.gallery-item');
+            items.forEach((item, i) => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, 3000 + i * 400);
+            });
         }
 
         // ============================================
