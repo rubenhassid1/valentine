@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Would You Be My Valentine?</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Dancing+Script:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Dancing+Script:wght@700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -15,6 +15,61 @@
             color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E") 12 12, auto;
+        }
+
+        /* ===== CINEMATIC INTRO ===== */
+        #cinematic-intro {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #cinematic-intro.fade-out {
+            animation: introFadeOut 1.5s ease forwards;
+        }
+        @keyframes introFadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+        .intro-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: #ff9eb8;
+            opacity: 0;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 0 30px;
+        }
+        .intro-text.visible {
+            animation: introTextIn 1.5s ease forwards;
+        }
+        .intro-text.fade {
+            animation: introTextOut 1s ease forwards;
+        }
+        @keyframes introTextIn {
+            from { opacity: 0; transform: translateY(20px); letter-spacing: 8px; }
+            to { opacity: 1; transform: translateY(0); letter-spacing: 2px; }
+        }
+        @keyframes introTextOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(-15px); }
+        }
+        .intro-heart-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff4d6d, transparent);
+            margin: 20px auto;
+            transition: width 1.5s ease;
+        }
+        .intro-heart-line.expand {
+            width: 200px;
         }
 
         /* ===== PARTICLE CANVAS ===== */
@@ -24,6 +79,19 @@
             width: 100%; height: 100%;
             z-index: 0;
             pointer-events: none;
+        }
+
+        /* ===== CURSOR TRAIL ===== */
+        .cursor-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            font-size: 12px;
+            animation: cursorHeartFade 1s ease forwards;
+        }
+        @keyframes cursorHeartFade {
+            0% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.3) translateY(-40px); }
         }
 
         /* ===== AMBIENT GLOW ===== */
@@ -36,36 +104,27 @@
         }
         .glow-1 {
             width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(255, 20, 80, 0.15), transparent 70%);
+            background: radial-gradient(circle, rgba(255, 20, 80, 0.18), transparent 70%);
             top: -100px; right: -100px;
             animation: glowDrift1 8s ease-in-out infinite;
         }
         .glow-2 {
             width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(255, 100, 150, 0.1), transparent 70%);
+            background: radial-gradient(circle, rgba(255, 100, 150, 0.12), transparent 70%);
             bottom: -50px; left: -50px;
             animation: glowDrift2 10s ease-in-out infinite;
         }
         .glow-3 {
             width: 250px; height: 250px;
-            background: radial-gradient(circle, rgba(200, 50, 120, 0.12), transparent 70%);
+            background: radial-gradient(circle, rgba(200, 50, 120, 0.14), transparent 70%);
             top: 40%; left: 50%;
             animation: glowDrift3 12s ease-in-out infinite;
         }
-        @keyframes glowDrift1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-40px, 30px); }
-        }
-        @keyframes glowDrift2 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -40px); }
-        }
-        @keyframes glowDrift3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.3); }
-        }
+        @keyframes glowDrift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-40px,30px)} }
+        @keyframes glowDrift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-40px)} }
+        @keyframes glowDrift3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-50%,-50%) scale(1.3)} }
 
-        /* ===== MAIN CONTAINER ===== */
+        /* ===== CONTAINER ===== */
         .container {
             position: relative;
             z-index: 1;
@@ -80,11 +139,7 @@
         }
 
         /* ===== SCREENS ===== */
-        .screen {
-            display: none;
-            width: 100%;
-            text-align: center;
-        }
+        .screen { display: none; width: 100%; text-align: center; }
         .screen.active {
             display: block;
             animation: screenIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -96,18 +151,18 @@
 
         /* ===== LANDING ===== */
         .landing .big-heart {
-            font-size: 100px;
+            font-size: 110px;
             display: block;
             margin-bottom: 10px;
             animation: heartbeat 1.2s ease-in-out infinite;
-            filter: drop-shadow(0 0 30px rgba(255, 50, 80, 0.5));
+            filter: drop-shadow(0 0 40px rgba(255, 50, 80, 0.6));
         }
         @keyframes heartbeat {
             0% { transform: scale(1); }
             15% { transform: scale(1.15); }
             30% { transform: scale(1); }
             45% { transform: scale(1.1); }
-            60%, 100% { transform: scale(1); }
+            60%,100% { transform: scale(1); }
         }
 
         .landing h1 {
@@ -121,12 +176,8 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: gradientShift 4s ease infinite;
-            text-shadow: none;
         }
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
 
         .landing .subtitle {
             font-size: 1.3rem;
@@ -136,10 +187,7 @@
             opacity: 0;
             animation: typeIn 0.6s ease 0.5s forwards;
         }
-        @keyframes typeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes typeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
         .btn {
             background: linear-gradient(135deg, #ff4d6d, #c9184a, #ff4d6d);
@@ -153,7 +201,7 @@
             border-radius: 60px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 25px rgba(255, 77, 109, 0.4), 0 0 60px rgba(255, 77, 109, 0.15);
+            box-shadow: 0 4px 25px rgba(255,77,109,0.4), 0 0 60px rgba(255,77,109,0.15);
             animation: gradientShift 3s ease infinite, btnGlow 2s ease-in-out infinite;
             position: relative;
             overflow: hidden;
@@ -173,27 +221,25 @@
         .btn:hover::before { opacity: 1; }
         .btn:hover {
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 40px rgba(255, 77, 109, 0.6), 0 0 80px rgba(255, 77, 109, 0.25);
+            box-shadow: 0 8px 40px rgba(255,77,109,0.6), 0 0 80px rgba(255,77,109,0.25);
         }
         .btn:active { transform: translateY(0) scale(0.98); }
         @keyframes btnGlow {
-            0%, 100% { box-shadow: 0 4px 25px rgba(255, 77, 109, 0.4), 0 0 60px rgba(255, 77, 109, 0.15); }
-            50% { box-shadow: 0 4px 35px rgba(255, 77, 109, 0.6), 0 0 80px rgba(255, 77, 109, 0.25); }
+            0%,100% { box-shadow: 0 4px 25px rgba(255,77,109,0.4), 0 0 60px rgba(255,77,109,0.15); }
+            50% { box-shadow: 0 4px 35px rgba(255,77,109,0.6), 0 0 80px rgba(255,77,109,0.25); }
         }
 
         /* ===== CAPTCHA BOX ===== */
         .captcha-box {
             background: linear-gradient(180deg, #1a0a10, #150810);
-            border: 1px solid rgba(255, 77, 109, 0.2);
+            border: 1px solid rgba(255,77,109,0.2);
             border-radius: 16px;
             overflow: hidden;
             width: 100%;
             max-width: 450px;
             margin: 0 auto;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(255, 77, 109, 0.08);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 60px rgba(255,77,109,0.08);
         }
-
         .captcha-header {
             background: linear-gradient(135deg, #c9184a, #e01650, #ff4d6d);
             padding: 18px 22px;
@@ -209,24 +255,10 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
             animation: shimmer 3s ease-in-out infinite;
         }
-        @keyframes shimmer {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(50%); }
-        }
+        @keyframes shimmer { 0%{transform:translateX(-50%)} 100%{transform:translateX(50%)} }
 
-        .captcha-header h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-            position: relative;
-            z-index: 1;
-        }
-        .captcha-header p {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            position: relative;
-            z-index: 1;
-        }
+        .captcha-header h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; position: relative; z-index: 1; }
+        .captcha-header p { font-size: 0.85rem; opacity: 0.85; position: relative; z-index: 1; }
 
         .captcha-grid {
             display: grid;
@@ -235,7 +267,6 @@
             padding: 3px;
             background: #0a0005;
         }
-
         .captcha-cell {
             position: relative;
             aspect-ratio: 1;
@@ -243,6 +274,12 @@
             overflow: hidden;
             border-radius: 3px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            animation: cellAppear 0.4s ease forwards;
+        }
+        @keyframes cellAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         .captcha-cell img {
             width: 100%; height: 100%;
@@ -250,18 +287,13 @@
             display: block;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .captcha-cell:hover img {
-            transform: scale(1.05);
-        }
+        .captcha-cell:hover img { transform: scale(1.08); }
         .captcha-cell.selected {
             outline: 3px solid #ff4d6d;
             outline-offset: -3px;
-            box-shadow: inset 0 0 20px rgba(255, 77, 109, 0.3);
+            box-shadow: inset 0 0 20px rgba(255,77,109,0.3);
         }
-        .captcha-cell.selected img {
-            transform: scale(0.85);
-            border-radius: 6px;
-        }
+        .captcha-cell.selected img { transform: scale(0.85); border-radius: 6px; }
         .captcha-cell.selected::after {
             content: '';
             position: absolute;
@@ -270,36 +302,18 @@
             background: linear-gradient(135deg, #ff4d6d, #c9184a);
             border-radius: 50%;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
-            background-size: 16px;
-            background-repeat: no-repeat;
-            background-position: center;
+            background-size: 16px; background-repeat: no-repeat; background-position: center;
             animation: checkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 2px 8px rgba(255, 77, 109, 0.5);
+            box-shadow: 0 2px 8px rgba(255,77,109,0.5);
         }
-        @keyframes checkPop {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
-
-        /* Wrong cell flash */
-        .captcha-cell.wrong {
-            animation: cellWrong 0.6s ease;
-        }
-        @keyframes cellWrong {
-            0%, 100% { background: transparent; }
-            25% { background: rgba(255, 0, 0, 0.4); }
-            50% { background: transparent; }
-            75% { background: rgba(255, 0, 0, 0.2); }
-        }
-
-        /* Correct cell flash */
-        .captcha-cell.correct-flash {
-            animation: cellCorrect 0.5s ease;
-        }
+        @keyframes checkPop { from{transform:scale(0)} to{transform:scale(1)} }
+        .captcha-cell.wrong { animation: cellWrong 0.6s ease; }
+        @keyframes cellWrong { 0%,100%{background:transparent} 25%{background:rgba(255,0,0,0.4)} 75%{background:rgba(255,0,0,0.2)} }
+        .captcha-cell.correct-flash { animation: cellCorrect 0.6s ease; }
         @keyframes cellCorrect {
-            0% { box-shadow: inset 0 0 0 rgba(0,255,100,0); }
-            50% { box-shadow: inset 0 0 30px rgba(0,255,100,0.4); }
-            100% { box-shadow: inset 0 0 0 rgba(0,255,100,0); }
+            0% { box-shadow: inset 0 0 0 rgba(0,255,100,0); transform: scale(1); }
+            50% { box-shadow: inset 0 0 30px rgba(0,255,100,0.5); transform: scale(1.05); }
+            100% { box-shadow: inset 0 0 0 rgba(0,255,100,0); transform: scale(1); }
         }
 
         .captcha-footer {
@@ -307,43 +321,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid rgba(255, 77, 109, 0.15);
-            background: rgba(255, 77, 109, 0.03);
+            border-top: 1px solid rgba(255,77,109,0.15);
+            background: rgba(255,77,109,0.03);
         }
-        .captcha-step {
-            font-size: 0.85rem;
-            color: #ff9eb8;
-        }
-
+        .captcha-step { font-size: 0.85rem; color: #ff9eb8; }
         .verify-btn {
             background: linear-gradient(135deg, #ff4d6d, #c9184a);
-            color: white;
-            border: none;
+            color: white; border: none;
             padding: 11px 32px;
-            font-size: 1rem;
-            font-family: 'Heebo', sans-serif;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
+            font-size: 1rem; font-family: 'Heebo', sans-serif; font-weight: 700;
+            border-radius: 10px; cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 15px rgba(255, 77, 109, 0.3);
+            box-shadow: 0 2px 15px rgba(255,77,109,0.3);
         }
         .verify-btn:hover {
             background: linear-gradient(135deg, #ff6b81, #e01650);
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(255, 77, 109, 0.5);
+            box-shadow: 0 4px 20px rgba(255,77,109,0.5);
         }
 
         /* ===== PROGRESS BAR ===== */
         .progress-bar {
-            width: 100%;
-            max-width: 450px;
-            height: 5px;
-            background: rgba(255, 77, 109, 0.1);
-            border-radius: 3px;
-            margin: 0 auto 20px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            width: 100%; max-width: 450px; height: 5px;
+            background: rgba(255,77,109,0.1);
+            border-radius: 3px; margin: 0 auto 20px; overflow: hidden;
         }
         .progress-fill {
             height: 100%;
@@ -352,252 +353,198 @@
             border-radius: 3px;
             transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             animation: gradientShift 2s ease infinite;
-            box-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+            box-shadow: 0 0 10px rgba(255,77,109,0.5);
         }
 
-        /* ===== ERROR MESSAGE ===== */
+        /* ===== ERROR ===== */
         .error-msg {
-            background: rgba(255, 30, 60, 0.12);
-            border: 1px solid rgba(255, 77, 109, 0.25);
+            background: rgba(255,30,60,0.12);
+            border: 1px solid rgba(255,77,109,0.25);
             color: #ff9eb8;
-            padding: 14px 22px;
-            border-radius: 12px;
-            margin-top: 16px;
-            font-size: 1.05rem;
+            padding: 14px 22px; border-radius: 12px;
+            margin-top: 16px; font-size: 1.05rem;
             display: none;
-            backdrop-filter: blur(5px);
         }
         .error-msg.show {
             display: block;
             animation: errorIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes errorIn {
-            0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
-            30% { transform: translateX(-8px); }
-            50% { transform: translateX(8px); }
-            70% { transform: translateX(-4px); }
-            90% { transform: translateX(4px); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0%{opacity:0;transform:translateY(-10px) scale(0.95)}
+            30%{transform:translateX(-8px)} 50%{transform:translateX(8px)}
+            70%{transform:translateX(-4px)} 90%{transform:translateX(4px)}
+            100%{opacity:1;transform:translateY(0) scale(1)}
         }
 
-        /* ===== SUCCESS TRANSITION ===== */
+        /* ===== SUCCESS OVERLAY ===== */
         .success-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            opacity: 0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50; display: flex; align-items: center; justify-content: center;
+            pointer-events: none; opacity: 0;
         }
-        .success-overlay.active {
-            opacity: 1;
-            animation: successFlash 1.2s ease forwards;
-        }
-        .success-overlay .success-icon {
-            font-size: 80px;
-            animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        @keyframes successFlash {
-            0% { background: transparent; }
-            20% { background: rgba(255, 77, 109, 0.15); }
-            100% { background: transparent; opacity: 0; }
-        }
-        @keyframes successPop {
-            0% { transform: scale(0) rotate(-20deg); }
-            60% { transform: scale(1.3) rotate(5deg); }
-            100% { transform: scale(1) rotate(0deg); }
-        }
+        .success-overlay.active { opacity: 1; animation: successFlash 1.2s ease forwards; }
+        .success-overlay .success-icon { font-size: 100px; animation: successPop 0.6s cubic-bezier(0.68,-0.55,0.265,1.55); }
+        @keyframes successFlash { 0%{background:transparent} 20%{background:rgba(255,77,109,0.15)} 100%{background:transparent;opacity:0} }
+        @keyframes successPop { 0%{transform:scale(0) rotate(-20deg)} 60%{transform:scale(1.4) rotate(5deg)} 100%{transform:scale(1) rotate(0)} }
 
         /* ===== REVEAL ===== */
         .reveal { text-align: center; }
-
         .reveal h1 {
             font-family: 'Dancing Script', cursive;
-            font-size: 3rem;
-            font-weight: 700;
+            font-size: 3.2rem; font-weight: 700;
             margin-bottom: 10px;
             background: linear-gradient(135deg, #ff6b9d, #ff2d55, #ffb347, #ff6b9d);
             background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 4s ease infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             opacity: 0;
             animation: gradientShift 4s ease infinite, revealTitle 1s ease 0.3s forwards;
         }
-        @keyframes revealTitle {
-            from { opacity: 0; transform: translateY(20px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
+        @keyframes revealTitle { from{opacity:0;transform:translateY(30px) scale(0.8)} to{opacity:1;transform:translateY(0) scale(1)} }
 
         .reveal .message {
-            font-size: 1.3rem;
-            color: #ff9eb8;
-            margin-bottom: 25px;
-            line-height: 2;
-            font-weight: 300;
-            opacity: 0;
-            animation: fadeUp 0.8s ease 0.8s forwards;
+            font-size: 1.3rem; color: #ff9eb8; margin-bottom: 25px;
+            line-height: 2; font-weight: 300;
+            opacity: 0; animation: fadeUp 0.8s ease 0.8s forwards;
         }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Typing effect container */
+        .typing-line {
+            display: inline;
+            border-left: 2px solid #ff4d6d;
+            padding-left: 4px;
+            animation: blink 0.7s step-end infinite;
         }
+        @keyframes blink { 0%,100%{border-color:#ff4d6d} 50%{border-color:transparent} }
 
         .reveal .restaurant-card {
-            background: linear-gradient(145deg, rgba(201, 24, 74, 0.15), rgba(255, 77, 109, 0.08));
-            border: 1px solid rgba(255, 77, 109, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 25px 0;
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            animation: cardReveal 0.8s ease 1.3s forwards;
-            box-shadow: 0 8px 40px rgba(255, 77, 109, 0.1);
+            background: linear-gradient(145deg, rgba(201,24,74,0.15), rgba(255,77,109,0.08));
+            border: 1px solid rgba(255,77,109,0.2);
+            border-radius: 20px; padding: 30px; margin: 25px 0;
+            position: relative; overflow: hidden;
+            opacity: 0; animation: cardReveal 0.8s ease 1.3s forwards;
+            box-shadow: 0 8px 40px rgba(255,77,109,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
         }
         .restaurant-card::before {
             content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 200%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            position: absolute; top: 0; left: -100%; width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
             animation: shimmer 4s ease-in-out infinite;
         }
-        @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        /* Animated border */
+        .restaurant-card::after {
+            content: '';
+            position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ff4d6d, #c9184a, #ffb347, #ff6b9d, #ff4d6d);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientShift 5s ease infinite;
+            opacity: 0.3;
         }
+        @keyframes cardReveal { from{opacity:0;transform:translateY(30px) scale(0.9) rotateX(10deg)} to{opacity:1;transform:translateY(0) scale(1) rotateX(0)} }
 
-        .restaurant-card .card-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-            display: block;
-        }
-        .restaurant-card .date {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #ff6b9d;
-            margin-bottom: 6px;
-            letter-spacing: 1px;
-        }
-        .restaurant-card .time {
-            font-size: 2rem;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .restaurant-card .location {
-            font-size: 1.1rem;
-            color: #cc7a8a;
-            margin-top: 8px;
-        }
-        .restaurant-card .dress-code {
-            font-size: 0.95rem;
-            color: #ff9eb8;
-            margin-top: 12px;
-            font-style: italic;
-            opacity: 0.8;
-        }
+        .restaurant-card .card-icon { font-size: 50px; margin-bottom: 15px; display: block; animation: floatIcon 3s ease-in-out infinite; }
+        @keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .restaurant-card .date { font-size: 1.6rem; font-weight: 900; color: #ff6b9d; margin-bottom: 6px; letter-spacing: 1px; }
+        .restaurant-card .time { font-size: 2.5rem; font-weight: 900; color: #fff; margin-bottom: 4px; text-shadow: 0 0 20px rgba(255,77,109,0.4); }
+        .restaurant-card .location { font-size: 1.1rem; color: #cc7a8a; margin-top: 8px; }
+        .restaurant-card .dress-code { font-size: 0.95rem; color: #ff9eb8; margin-top: 12px; font-style: italic; opacity: 0.8; }
 
         .audio-btn {
             background: linear-gradient(135deg, #ff4d6d, #c9184a, #ff4d6d);
             background-size: 200% 200%;
-            color: white;
-            border: none;
-            padding: 14px 36px;
-            font-size: 1.05rem;
-            font-family: 'Heebo', sans-serif;
-            font-weight: 700;
-            border-radius: 60px;
-            cursor: pointer;
-            margin-top: 20px;
+            color: white; border: none;
+            padding: 16px 40px; font-size: 1.1rem;
+            font-family: 'Heebo', sans-serif; font-weight: 700;
+            border-radius: 60px; cursor: pointer; margin-top: 20px;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 25px rgba(255, 77, 109, 0.4);
-            animation: gradientShift 3s ease infinite, btnGlow 2s ease-in-out infinite;
-            opacity: 0;
+            box-shadow: 0 4px 25px rgba(255,77,109,0.4);
             animation: gradientShift 3s ease infinite, btnGlow 2s ease-in-out infinite, fadeUp 0.8s ease 1.8s forwards;
-            position: relative;
-            overflow: hidden;
+            opacity: 0;
+            position: relative; overflow: hidden;
         }
         .audio-btn::after {
             content: '';
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             width: 0; height: 0;
             background: rgba(255,255,255,0.15);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             transition: width 0.5s, height 0.5s;
         }
-        .audio-btn:hover::after {
-            width: 300px; height: 300px;
-        }
-        .audio-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 40px rgba(255, 77, 109, 0.6);
-        }
-        .audio-btn.loading {
-            opacity: 0.7 !important;
-            pointer-events: none;
-        }
-        .audio-btn .btn-text {
-            position: relative;
-            z-index: 1;
-        }
+        .audio-btn:hover::after { width: 300px; height: 300px; }
+        .audio-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 40px rgba(255,77,109,0.6); }
+        .audio-btn.loading { opacity: 0.7 !important; pointer-events: none; }
+        .audio-btn .btn-text { position: relative; z-index: 1; }
 
         /* Audio visualizer */
-        .audio-visualizer {
-            display: none;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 3px;
-            height: 30px;
-            margin-top: 15px;
-        }
-        .audio-visualizer.active {
-            display: flex;
-        }
+        .audio-visualizer { display: none; justify-content: center; align-items: flex-end; gap: 3px; height: 35px; margin-top: 18px; }
+        .audio-visualizer.active { display: flex; }
         .audio-bar {
             width: 4px;
-            background: linear-gradient(to top, #ff4d6d, #ff9eb8);
+            background: linear-gradient(to top, #ff4d6d, #ff9eb8, #ffb347);
             border-radius: 2px;
             animation: audioWave 0.8s ease-in-out infinite;
+            box-shadow: 0 0 6px rgba(255,77,109,0.3);
         }
-        @keyframes audioWave {
-            0%, 100% { height: 5px; }
-            50% { height: 25px; }
-        }
+        @keyframes audioWave { 0%,100%{height:4px} 50%{height:28px} }
 
         .reveal .final-heart {
-            font-size: 90px;
-            display: inline-block;
+            font-size: 100px; display: inline-block;
             animation: heartbeat 1.2s ease-in-out infinite;
             margin-top: 25px;
-            filter: drop-shadow(0 0 40px rgba(255, 50, 80, 0.5));
+            filter: drop-shadow(0 0 50px rgba(255,50,80,0.6));
             opacity: 0;
             animation: heartbeat 1.2s ease-in-out infinite, fadeUp 0.8s ease 2.3s forwards;
         }
 
-        /* ===== CONFETTI ===== */
-        .confetti-container {
-            position: fixed;
-            top: 0; left: 0;
+        /* ===== LOVE LETTER (between captcha 3 and reveal) ===== */
+        .love-letter-overlay {
+            position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 100;
-            overflow: hidden;
+            z-index: 60;
+            display: none;
+            align-items: center; justify-content: center;
+            background: rgba(10, 0, 5, 0.95);
+            backdrop-filter: blur(10px);
         }
-        .confetti-piece {
-            position: absolute;
-            top: -20px;
+        .love-letter-overlay.active { display: flex; }
+        .love-letter {
+            max-width: 440px; width: 90%;
+            padding: 40px 30px;
+            text-align: center;
         }
-        .confetti-fall {
-            animation: confettiFall linear forwards;
+        .love-letter .ll-emoji { font-size: 60px; margin-bottom: 15px; display: block; }
+        .love-letter .ll-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.3rem;
+            color: #ff9eb8;
+            line-height: 2;
+            min-height: 80px;
         }
+        .love-letter .ll-cursor {
+            display: inline-block;
+            width: 2px; height: 1.3em;
+            background: #ff4d6d;
+            margin-right: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.7s step-end infinite;
+        }
+        .love-letter .ll-skip {
+            margin-top: 30px;
+            color: rgba(255,158,184,0.4);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .love-letter .ll-skip:hover { color: #ff9eb8; }
+
+        /* ===== CONFETTI ===== */
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; overflow: hidden; }
+        .confetti-piece { position: absolute; top: -20px; }
+        .confetti-fall { animation: confettiFall linear forwards; }
         @keyframes confettiFall {
             0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
             80% { opacity: 1; }
@@ -605,16 +552,11 @@
         }
 
         /* ===== FIREWORKS ===== */
-        .firework {
-            position: fixed;
-            pointer-events: none;
-            z-index: 99;
-        }
+        .firework { position: fixed; pointer-events: none; z-index: 99; }
         .firework-particle {
             position: absolute;
-            width: 4px; height: 4px;
             border-radius: 50%;
-            animation: fireworkExplode 1.5s ease-out forwards;
+            animation: fireworkExplode 1.8s ease-out forwards;
         }
         @keyframes fireworkExplode {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
@@ -622,35 +564,42 @@
         }
 
         /* ===== SCREEN SHAKE ===== */
-        .shake {
-            animation: screenShake 0.4s ease;
-        }
+        .shake { animation: screenShake 0.5s ease; }
         @keyframes screenShake {
-            0%, 100% { transform: translateX(0); }
-            15% { transform: translateX(-6px) rotate(-0.5deg); }
-            30% { transform: translateX(6px) rotate(0.5deg); }
-            45% { transform: translateX(-4px); }
-            60% { transform: translateX(4px); }
-            75% { transform: translateX(-2px); }
+            0%,100%{transform:translateX(0)}
+            10%{transform:translateX(-8px) rotate(-1deg)}
+            20%{transform:translateX(8px) rotate(1deg)}
+            30%{transform:translateX(-6px) rotate(-0.5deg)}
+            40%{transform:translateX(6px) rotate(0.5deg)}
+            50%{transform:translateX(-4px)}
+            60%{transform:translateX(4px)}
+            70%{transform:translateX(-2px)}
         }
 
         /* ===== MOBILE ===== */
         @media (max-width: 480px) {
             .landing h1 { font-size: 2.5rem; }
             .landing .big-heart { font-size: 80px; }
-            .reveal h1 { font-size: 2.3rem; }
+            .reveal h1 { font-size: 2.5rem; }
             .captcha-box { border-radius: 12px; }
-            .restaurant-card { padding: 20px; }
+            .restaurant-card { padding: 22px; }
+            .intro-text { font-size: 1.1rem; }
+            .restaurant-card .time { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Ambient glow -->
+    <!-- ===== CINEMATIC INTRO ===== -->
+    <div id="cinematic-intro">
+        <div class="intro-text" id="introText1">A love story in 3 captchas...</div>
+        <div class="intro-heart-line" id="introLine"></div>
+        <div class="intro-text" id="introText2" style="margin-top:0">Ruben & Michal</div>
+    </div>
+
+    <!-- Ambient -->
     <div class="ambient-glow glow-1"></div>
     <div class="ambient-glow glow-2"></div>
     <div class="ambient-glow glow-3"></div>
-
-    <!-- Particle canvas -->
     <canvas id="particleCanvas"></canvas>
 
     <div class="container">
@@ -665,7 +614,7 @@
 
         <!-- CAPTCHA 1 -->
         <div class="screen" id="screen-captcha1">
-            <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 0%"></div></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
             <div class="captcha-box">
                 <div class="captcha-header">
                     <h2>בחרי את כל התמונות של רובן</h2>
@@ -739,6 +688,15 @@
         </div>
     </div>
 
+    <!-- LOVE LETTER OVERLAY -->
+    <div class="love-letter-overlay" id="loveLetterOverlay">
+        <div class="love-letter">
+            <span class="ll-emoji">&#128140;</span>
+            <div class="ll-text" id="loveLetterText"><span class="ll-cursor"></span></div>
+            <div class="ll-skip" onclick="skipLoveLetter()">tap to skip</div>
+        </div>
+    </div>
+
     <!-- Overlays -->
     <div class="success-overlay" id="successOverlay">
         <span class="success-icon" id="successIcon"></span>
@@ -754,62 +712,86 @@
         const VOICE_MESSAGE = "Hi, I'm Claude. Ruben's ex. He said you're the new girlfriend, and I now have to let you have him. So he made me say this to you: you are invited for a Valentine's Day dinner. I'm a bit jealous. Take care of him.";
 
         // ============================================
+        // CINEMATIC INTRO SEQUENCE
+        // ============================================
+        (function() {
+            const intro = document.getElementById('cinematic-intro');
+            const t1 = document.getElementById('introText1');
+            const line = document.getElementById('introLine');
+            const t2 = document.getElementById('introText2');
+
+            setTimeout(() => t1.classList.add('visible'), 500);
+            setTimeout(() => line.classList.add('expand'), 1500);
+            setTimeout(() => t2.classList.add('visible'), 2500);
+            setTimeout(() => {
+                t1.classList.add('fade');
+                t2.classList.add('fade');
+            }, 4500);
+            setTimeout(() => {
+                intro.classList.add('fade-out');
+                setTimeout(() => intro.style.display = 'none', 1500);
+            }, 5500);
+        })();
+
+        // ============================================
+        // CURSOR TRAIL
+        // ============================================
+        let lastTrail = 0;
+        document.addEventListener('mousemove', e => {
+            const now = Date.now();
+            if (now - lastTrail < 80) return;
+            lastTrail = now;
+            const h = document.createElement('span');
+            h.className = 'cursor-heart';
+            h.textContent = ['❤','💕','✨','💖'][Math.floor(Math.random()*4)];
+            h.style.left = e.clientX + 'px';
+            h.style.top = e.clientY + 'px';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 1000);
+        });
+
+        // ============================================
         // PHOTO DATA
         // ============================================
         const captchaData = {
             1: {
-                correct: [
-                    'RUBEN/ruben 1.jpg', 'RUBEN/ruben 2.avif', 'RUBEN/ruben 3.jpg',
-                    'RUBEN/ruben 4.jpg', 'RUBEN/ruben 5.jpeg'
-                ],
-                decoys: [
-                    'RUBEN/not ruben 1.webp', 'RUBEN/not ruben 2.jpeg',
-                    'RUBEN/not ruben 3.png', 'RUBEN/not ruben 4.jpeg'
-                ],
+                correct: ['RUBEN/ruben 1.jpg','RUBEN/ruben 2.avif','RUBEN/ruben 3.jpg','RUBEN/ruben 4.jpg','RUBEN/ruben 5.jpeg'],
+                decoys: ['RUBEN/not ruben 1.webp','RUBEN/not ruben 2.jpeg','RUBEN/not ruben 3.png','RUBEN/not ruben 4.jpeg'],
                 errors: [
-                    '!את בטוחה שזה אני? תסתכלי טוב &#128064;',
-                    '!רגע רגע, את לא מזהה אותי? &#128557;',
-                    '...נו מיכל, אני הבן זוג שלך &#128556;',
-                    '!תנסי שוב, אני מאמין בך &#128170;',
-                    'אולי את צריכה משקפיים? &#129488; תסתכלי שוב'
+                    '!את בטוחה שזה אני? תסתכלי טוב \u{1F440}',
+                    '!רגע רגע, את לא מזהה אותי? \u{1F62D}',
+                    '...נו מיכל, אני הבן זוג שלך \u{1F62C}',
+                    '!תנסי שוב, אני מאמין בך \u{1F4AA}',
+                    'אולי את צריכה משקפיים? \u{1F9D0} תסתכלי שוב'
                 ],
-                successEmoji: '&#128526;'
+                successEmoji: '\u{1F60E}',
+                successMsg: '!יאללה, את מכירה אותי'
             },
             2: {
-                correct: [
-                    'MICHAL/michal 1.jpeg', 'MICHAL/michal 2.jpeg', 'MICHAL/michal 3.png',
-                    'MICHAL/michal 4.webp', 'MICHAL/michal 5.jpg'
-                ],
-                decoys: [
-                    'MICHAL/not michal 1.png', 'MICHAL/not michal 2.png',
-                    'MICHAL/not michal 3.jpg', 'MICHAL/not michal 4.avif'
-                ],
+                correct: ['MICHAL/michal 1.jpeg','MICHAL/michal 2.jpeg','MICHAL/michal 3.png','MICHAL/michal 4.webp','MICHAL/michal 5.jpg'],
+                decoys: ['MICHAL/not michal 1.png','MICHAL/not michal 2.png','MICHAL/not michal 3.jpg','MICHAL/not michal 4.avif'],
                 errors: [
-                    '!נו באמת, את לא מכירה את עצמך? &#128580;',
-                    '!מיכל, זו לא את. תסתכלי במראה &#128536;',
-                    '?רגע, את לא יודעת איך את נראית &#129300;',
-                    '!תנסי שוב, את יותר יפה מזה &#128525;',
-                    'את בטוחה? תסתכלי שוב על התמונות &#128064;'
+                    '!נו באמת, את לא מכירה את עצמך? \u{1F644}',
+                    '!מיכל, זו לא את. תסתכלי במראה \u{1F618}',
+                    '?רגע, את לא יודעת איך את נראית \u{1F914}',
+                    '!תנסי שוב, את יותר יפה מזה \u{1F60D}',
+                    'את בטוחה? תסתכלי שוב על התמונות \u{1F440}'
                 ],
-                successEmoji: '&#128525;'
+                successEmoji: '\u{1F60D}',
+                successMsg: '!נכון, זו את היפה שלי'
             },
             3: {
-                correct: [
-                    'US/calvin klein couple.webp', 'US/couple PT.webp', 'US/couple bambi.jpg',
-                    'US/couple joe black.jpg', 'US/couple knight.png'
-                ],
-                decoys: [
-                    'US/cringe couple 1.jpg', 'US/cringe couple 2.jpg',
-                    'US/cringe couple 3.jpg', 'US/cringe couple 4.jpg'
-                ],
+                correct: ['US/calvin klein couple.webp','US/couple PT.webp','US/couple bambi.jpg','US/couple joe black.jpg','US/couple knight.png'],
+                decoys: ['US/cringe couple 1.jpg','US/cringe couple 2.jpg','US/cringe couple 3.jpg','US/cringe couple 4.jpg'],
                 errors: [
-                    '!אנחנו לא נראים ככה &#128514;',
-                    '?הזוג הזה? רצינית &#129315;',
-                    '!אנחנו הרבה יותר חמודים &#128524;',
-                    '!לא לא לא, תסתכלי שוב &#128528;',
-                    '!אנחנו הזוג הכי יפה, לא הם &#128149;'
+                    '!אנחנו לא נראים ככה \u{1F602}',
+                    '?הזוג הזה? רצינית \u{1F923}',
+                    '!אנחנו הרבה יותר חמודים \u{1F60C}',
+                    '!לא לא לא, תסתכלי שוב \u{1F610}',
+                    '!אנחנו הזוג הכי יפה, לא הם \u{1F495}'
                 ],
-                successEmoji: '&#128149;'
+                successEmoji: '\u{1F495}',
+                successMsg: '...הזוג הכי יפה'
             }
         };
 
@@ -820,20 +802,15 @@
         // ============================================
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let particlesList = [];
         let mouseX = 0, mouseY = 0;
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
         class Particle {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
@@ -846,211 +823,225 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-
-                // Subtle mouse attraction
                 const dx = mouseX - this.x;
                 const dy = mouseY - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                const dist = Math.sqrt(dx*dx + dy*dy);
                 if (dist < 150) {
-                    this.x += dx * 0.002;
-                    this.y += dy * 0.002;
+                    this.x += dx * 0.003;
+                    this.y += dy * 0.003;
                     this.opacity = Math.min(this.opacity + 0.01, 0.6);
                 }
-
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
+                if (this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset();
             }
             draw() {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.opacity})`;
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fillStyle = `hsla(${this.hue},100%,70%,${this.opacity})`;
                 ctx.fill();
             }
         }
-
-        for (let i = 0; i < 60; i++) {
-            particles.push(new Particle());
-        }
+        for (let i=0;i<80;i++) particlesList.push(new Particle());
 
         function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw connections
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120) {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            for (let i=0;i<particlesList.length;i++) {
+                for (let j=i+1;j<particlesList.length;j++) {
+                    const dx=particlesList[i].x-particlesList[j].x;
+                    const dy=particlesList[i].y-particlesList[j].y;
+                    const dist=Math.sqrt(dx*dx+dy*dy);
+                    if (dist<100) {
                         ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(255, 77, 109, ${0.06 * (1 - dist / 120)})`;
-                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particlesList[i].x,particlesList[i].y);
+                        ctx.lineTo(particlesList[j].x,particlesList[j].y);
+                        ctx.strokeStyle=`rgba(255,77,109,${0.08*(1-dist/100)})`;
+                        ctx.lineWidth=0.5;
                         ctx.stroke();
                     }
                 }
             }
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particlesList.forEach(p=>{p.update();p.draw()});
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
 
-        document.addEventListener('mousemove', e => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-        document.addEventListener('touchmove', e => {
-            mouseX = e.touches[0].clientX;
-            mouseY = e.touches[0].clientY;
-        });
+        document.addEventListener('mousemove', e=>{ mouseX=e.clientX; mouseY=e.clientY; });
+        document.addEventListener('touchmove', e=>{ mouseX=e.touches[0].clientX; mouseY=e.touches[0].clientY; });
 
         // ============================================
         // SHUFFLE
         // ============================================
-        function shuffle(arr) {
-            const a = [...arr];
-            for (let i = a.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [a[i], a[j]] = [a[j], a[i]];
-            }
-            return a;
-        }
+        function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 
         // ============================================
-        // BUILD CAPTCHA GRID
+        // BUILD GRID
         // ============================================
-        function buildGrid(captchaNum) {
-            const data = captchaData[captchaNum];
-            const allImages = [
-                ...data.correct.map(src => ({ src, correct: true })),
-                ...data.decoys.map(src => ({ src, correct: false }))
-            ];
-            const shuffled = shuffle(allImages);
-            const grid = document.getElementById('grid' + captchaNum);
+        function buildGrid(num) {
+            const data = captchaData[num];
+            const all = [...data.correct.map(s=>({src:s,correct:true})),...data.decoys.map(s=>({src:s,correct:false}))];
+            const shuffled = shuffle(all);
+            const grid = document.getElementById('grid'+num);
             grid.innerHTML = '';
-
-            shuffled.forEach((item, index) => {
+            shuffled.forEach((item, i) => {
                 const cell = document.createElement('div');
                 cell.className = 'captcha-cell';
                 cell.dataset.correct = item.correct;
-                cell.style.animationDelay = (index * 0.05) + 's';
+                cell.style.animationDelay = (i * 0.06) + 's';
                 cell.onclick = () => {
                     cell.classList.toggle('selected');
-                    // Haptic-style micro animation
-                    cell.style.transform = 'scale(0.93)';
-                    setTimeout(() => cell.style.transform = '', 150);
+                    cell.style.transform = 'scale(0.92)';
+                    setTimeout(()=>cell.style.transform='',150);
                 };
-
                 const img = document.createElement('img');
                 img.src = item.src;
                 img.alt = '';
-                img.loading = 'eager';
                 img.draggable = false;
-
                 cell.appendChild(img);
                 grid.appendChild(cell);
             });
         }
 
         // ============================================
-        // SCREEN TRANSITIONS
+        // SCREENS
         // ============================================
         function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            const screen = document.getElementById(id);
-            screen.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo({top:0,behavior:'smooth'});
         }
-
-        function startGame() {
-            buildGrid(1);
-            showScreen('screen-captcha1');
-        }
+        function startGame() { buildGrid(1); showScreen('screen-captcha1'); }
 
         // ============================================
-        // VERIFY CAPTCHA
+        // VERIFY
         // ============================================
         function verifyCaptcha(num) {
-            const grid = document.getElementById('grid' + num);
+            const grid = document.getElementById('grid'+num);
             const cells = grid.querySelectorAll('.captcha-cell');
-            const errorEl = document.getElementById('error' + num);
-
-            let allCorrectSelected = true;
-            let anyWrongSelected = false;
-
-            cells.forEach(cell => {
-                const isCorrect = cell.dataset.correct === 'true';
-                const isSelected = cell.classList.contains('selected');
-                if (isCorrect && !isSelected) allCorrectSelected = false;
-                if (!isCorrect && isSelected) anyWrongSelected = true;
+            const errorEl = document.getElementById('error'+num);
+            let ok = true, wrong = false;
+            cells.forEach(c => {
+                const cor = c.dataset.correct==='true';
+                const sel = c.classList.contains('selected');
+                if(cor&&!sel) ok=false;
+                if(!cor&&sel) wrong=true;
             });
 
-            if (allCorrectSelected && !anyWrongSelected) {
+            if (ok && !wrong) {
                 errorEl.classList.remove('show');
-
-                // Flash correct cells green
-                cells.forEach(cell => {
-                    if (cell.dataset.correct === 'true') {
-                        cell.classList.add('correct-flash');
-                    }
-                });
-
-                // Show success overlay
+                // Flash correct
+                cells.forEach(c => { if(c.dataset.correct==='true') c.classList.add('correct-flash'); });
+                // Success overlay with message
                 const overlay = document.getElementById('successOverlay');
                 const icon = document.getElementById('successIcon');
-                icon.innerHTML = captchaData[num].successEmoji;
+                icon.textContent = captchaData[num].successEmoji;
                 overlay.classList.add('active');
-
                 setTimeout(() => {
                     overlay.classList.remove('active');
                     onCaptchaSuccess(num);
-                }, 1000);
+                }, 1200);
             } else {
-                // Screen shake
-                const captchaBox = grid.closest('.captcha-box');
-                captchaBox.classList.add('shake');
-                setTimeout(() => captchaBox.classList.remove('shake'), 500);
-
-                // Flash wrong selections red
-                cells.forEach(cell => {
-                    const isCorrect = cell.dataset.correct === 'true';
-                    const isSelected = cell.classList.contains('selected');
-                    if (!isCorrect && isSelected) {
-                        cell.classList.add('wrong');
-                        setTimeout(() => cell.classList.remove('wrong'), 600);
+                // Shake
+                const box = grid.closest('.captcha-box');
+                box.classList.add('shake');
+                setTimeout(()=>box.classList.remove('shake'),500);
+                // Flash wrong red
+                cells.forEach(c => {
+                    if(c.dataset.correct!=='true'&&c.classList.contains('selected')) {
+                        c.classList.add('wrong');
+                        setTimeout(()=>c.classList.remove('wrong'),600);
                     }
                 });
-
-                const errors = captchaData[num].errors;
-                const msg = errors[errorCounts[num] % errors.length];
+                const errs = captchaData[num].errors;
+                errorEl.innerHTML = errs[errorCounts[num]%errs.length];
                 errorCounts[num]++;
-
-                errorEl.innerHTML = msg;
                 errorEl.classList.remove('show');
                 void errorEl.offsetHeight;
                 errorEl.classList.add('show');
-
-                cells.forEach(cell => cell.classList.remove('selected'));
+                cells.forEach(c=>c.classList.remove('selected'));
             }
         }
 
         function onCaptchaSuccess(num) {
             if (num < 3) {
-                const nextNum = num + 1;
-                buildGrid(nextNum);
-                showScreen('screen-captcha' + nextNum);
+                buildGrid(num+1);
+                showScreen('screen-captcha'+(num+1));
             } else {
+                // Show love letter transition before reveal
+                showLoveLetter();
+            }
+        }
+
+        // ============================================
+        // LOVE LETTER TYPEWRITER
+        // ============================================
+        const loveLetterLines = [
+            "מיכל יקרה,",
+            "",
+            "עברת את כל השלבים.",
+            "הוכחת שאת מכירה אותי,",
+            "שאת מכירה את עצמך,",
+            "ושאת מכירה אותנו.",
+            "",
+            "עכשיו, יש לי הפתעה בשבילך..."
+        ];
+
+        let llTimeout;
+        let llFinished = false;
+
+        function showLoveLetter() {
+            const overlay = document.getElementById('loveLetterOverlay');
+            const textEl = document.getElementById('loveLetterText');
+            overlay.classList.add('active');
+
+            let lineIdx = 0;
+            let charIdx = 0;
+            let fullText = '';
+            llFinished = false;
+
+            function typeNext() {
+                if (llFinished) return;
+                if (lineIdx >= loveLetterLines.length) {
+                    // Done typing
+                    setTimeout(() => {
+                        if (!llFinished) finishLoveLetter();
+                    }, 2000);
+                    return;
+                }
+                const line = loveLetterLines[lineIdx];
+                if (charIdx < line.length) {
+                    fullText += line[charIdx];
+                    textEl.innerHTML = fullText + '<span class="ll-cursor"></span>';
+                    charIdx++;
+                    llTimeout = setTimeout(typeNext, 50 + Math.random()*30);
+                } else {
+                    fullText += '<br>';
+                    lineIdx++;
+                    charIdx = 0;
+                    llTimeout = setTimeout(typeNext, line === '' ? 300 : 500);
+                }
+            }
+            setTimeout(typeNext, 800);
+        }
+
+        function skipLoveLetter() {
+            llFinished = true;
+            clearTimeout(llTimeout);
+            finishLoveLetter();
+        }
+
+        function finishLoveLetter() {
+            llFinished = true;
+            const overlay = document.getElementById('loveLetterOverlay');
+            overlay.style.transition = 'opacity 1s ease';
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                overlay.style.opacity = '';
+                overlay.style.transition = '';
                 showScreen('screen-reveal');
                 launchConfetti();
                 launchFireworks();
-                setTimeout(() => playVoiceMessage(), 2000);
-            }
+                setTimeout(() => playVoiceMessage(), 2500);
+            }, 1000);
         }
 
         // ============================================
@@ -1058,34 +1049,31 @@
         // ============================================
         function launchConfetti() {
             const container = document.getElementById('confettiContainer');
-            const colors = ['#ff4d6d', '#ff6b9d', '#ffb347', '#ff85a2', '#ffd700', '#ff69b4', '#fff', '#c9184a'];
-            const emojis = ['\u2764\uFE0F', '\u2728', '\uD83C\uDF89', '\uD83C\uDF88', '\uD83D\uDC95', '\uD83D\uDC96', '\u2763\uFE0F', '\uD83C\uDF39'];
-
-            for (let wave = 0; wave < 3; wave++) {
+            const colors = ['#ff4d6d','#ff6b9d','#ffb347','#ff85a2','#ffd700','#ff69b4','#fff','#c9184a'];
+            const emojis = ['\u2764\uFE0F','\u2728','\uD83C\uDF89','\uD83C\uDF88','\uD83D\uDC95','\uD83D\uDC96','\u2763\uFE0F','\uD83C\uDF39','\uD83E\uDDE1','\uD83D\uDC8B'];
+            for (let wave=0; wave<4; wave++) {
                 setTimeout(() => {
-                    for (let i = 0; i < 50; i++) {
+                    for (let i=0;i<60;i++) {
                         setTimeout(() => {
-                            const piece = document.createElement('div');
-                            piece.className = 'confetti-piece confetti-fall';
-                            piece.style.left = Math.random() * 100 + '%';
-                            piece.style.animationDuration = (2.5 + Math.random() * 3) + 's';
-                            piece.style.animationDelay = Math.random() * 0.3 + 's';
-
-                            if (Math.random() > 0.35) {
-                                piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                                piece.style.fontSize = (16 + Math.random() * 24) + 'px';
+                            const p = document.createElement('div');
+                            p.className = 'confetti-piece confetti-fall';
+                            p.style.left = Math.random()*100+'%';
+                            p.style.animationDuration = (2.5+Math.random()*3)+'s';
+                            p.style.animationDelay = Math.random()*0.3+'s';
+                            if (Math.random()>0.3) {
+                                p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+                                p.style.fontSize = (18+Math.random()*26)+'px';
                             } else {
-                                piece.style.width = (8 + Math.random() * 10) + 'px';
-                                piece.style.height = (8 + Math.random() * 10) + 'px';
-                                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                                p.style.width = (8+Math.random()*10)+'px';
+                                p.style.height = p.style.width;
+                                p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                                p.style.borderRadius = Math.random()>0.5?'50%':'2px';
                             }
-
-                            container.appendChild(piece);
-                            setTimeout(() => piece.remove(), 6000);
-                        }, i * 30);
+                            container.appendChild(p);
+                            setTimeout(()=>p.remove(),6000);
+                        }, i*25);
                     }
-                }, wave * 2000);
+                }, wave*2500);
             }
         }
 
@@ -1093,42 +1081,32 @@
         // FIREWORKS
         // ============================================
         function launchFireworks() {
-            for (let i = 0; i < 8; i++) {
+            for (let i=0;i<12;i++) {
                 setTimeout(() => {
-                    createFirework(
-                        Math.random() * window.innerWidth,
-                        Math.random() * window.innerHeight * 0.6
-                    );
-                }, i * 600 + Math.random() * 400);
+                    createFirework(Math.random()*window.innerWidth, Math.random()*window.innerHeight*0.6);
+                }, i*500+Math.random()*300);
             }
         }
-
-        function createFirework(x, y) {
-            const container = document.createElement('div');
-            container.className = 'firework';
-            container.style.left = x + 'px';
-            container.style.top = y + 'px';
-
-            const colors = ['#ff4d6d', '#ff6b9d', '#ffb347', '#ffd700', '#ff69b4', '#fff'];
-            const particles = 20 + Math.floor(Math.random() * 15);
-
-            for (let i = 0; i < particles; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'firework-particle';
-                const angle = (i / particles) * Math.PI * 2;
-                const distance = 60 + Math.random() * 80;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
-                particle.style.setProperty('--tx', tx + 'px');
-                particle.style.setProperty('--ty', ty + 'px');
-                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.width = (2 + Math.random() * 3) + 'px';
-                particle.style.height = particle.style.width;
-                container.appendChild(particle);
+        function createFirework(x,y) {
+            const c = document.createElement('div');
+            c.className = 'firework';
+            c.style.left=x+'px'; c.style.top=y+'px';
+            const colors=['#ff4d6d','#ff6b9d','#ffb347','#ffd700','#ff69b4','#fff','#ff2d55'];
+            const n = 25+Math.floor(Math.random()*15);
+            for (let i=0;i<n;i++) {
+                const p = document.createElement('div');
+                p.className = 'firework-particle';
+                const angle = (i/n)*Math.PI*2;
+                const dist = 70+Math.random()*100;
+                p.style.setProperty('--tx',Math.cos(angle)*dist+'px');
+                p.style.setProperty('--ty',Math.sin(angle)*dist+'px');
+                p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                const size = 2+Math.random()*4;
+                p.style.width=size+'px'; p.style.height=size+'px';
+                c.appendChild(p);
             }
-
-            document.body.appendChild(container);
-            setTimeout(() => container.remove(), 2000);
+            document.body.appendChild(c);
+            setTimeout(()=>c.remove(),2500);
         }
 
         // ============================================
@@ -1136,66 +1114,46 @@
         // ============================================
         async function playVoiceMessage() {
             const btn = document.getElementById('playVoiceBtn');
-            const visualizer = document.getElementById('audioVisualizer');
-
-            btn.querySelector('.btn-text').innerHTML = '&#127911; ...&#128260;';
+            const viz = document.getElementById('audioVisualizer');
+            btn.querySelector('.btn-text').innerHTML = '\u{1F3A7} ...\u{1F504}';
             btn.classList.add('loading');
 
             try {
-                const response = await fetch(
-                    `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'audio/mpeg',
-                            'Content-Type': 'application/json',
-                            'xi-api-key': ELEVENLABS_API_KEY
-                        },
-                        body: JSON.stringify({
-                            text: VOICE_MESSAGE,
-                            model_id: 'eleven_multilingual_v2',
-                            voice_settings: {
-                                stability: 0.5,
-                                similarity_boost: 0.8
-                            }
-                        })
-                    }
-                );
+                const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+                    method: 'POST',
+                    headers: { 'Accept':'audio/mpeg', 'Content-Type':'application/json', 'xi-api-key':ELEVENLABS_API_KEY },
+                    body: JSON.stringify({ text:VOICE_MESSAGE, model_id:'eleven_multilingual_v2', voice_settings:{stability:0.5,similarity_boost:0.8} })
+                });
+                if (!res.ok) throw new Error('API error');
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
 
-                if (!response.ok) throw new Error('API error');
-
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-
-                // Build visualizer
-                visualizer.innerHTML = '';
-                for (let i = 0; i < 20; i++) {
+                viz.innerHTML = '';
+                for (let i=0;i<24;i++) {
                     const bar = document.createElement('div');
                     bar.className = 'audio-bar';
-                    bar.style.animationDelay = (i * 0.05) + 's';
-                    bar.style.animationDuration = (0.4 + Math.random() * 0.6) + 's';
-                    visualizer.appendChild(bar);
+                    bar.style.animationDelay = (i*0.04)+'s';
+                    bar.style.animationDuration = (0.3+Math.random()*0.5)+'s';
+                    viz.appendChild(bar);
                 }
 
                 audio.play();
-                btn.querySelector('.btn-text').innerHTML = '&#127911; &#9654; מנגן...';
+                btn.querySelector('.btn-text').innerHTML = '\u{1F3A7} \u25B6 מנגן...';
                 btn.classList.remove('loading');
-                visualizer.classList.add('active');
+                viz.classList.add('active');
 
                 audio.onended = () => {
-                    btn.querySelector('.btn-text').innerHTML = '&#127911; הקשיבי שוב';
-                    visualizer.classList.remove('active');
+                    btn.querySelector('.btn-text').innerHTML = '\u{1F3A7} הקשיבי שוב';
+                    viz.classList.remove('active');
                 };
             } catch (err) {
                 console.error('Voice error:', err);
-                btn.querySelector('.btn-text').innerHTML = '&#127911; הקשיבי להודעה';
+                btn.querySelector('.btn-text').innerHTML = '\u{1F3A7} הקשיבי להודעה';
                 btn.classList.remove('loading');
-
-                const utterance = new SpeechSynthesisUtterance(VOICE_MESSAGE);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
+                const u = new SpeechSynthesisUtterance(VOICE_MESSAGE);
+                u.lang = 'en-US'; u.rate = 0.9;
+                speechSynthesis.speak(u);
             }
         }
     </script>
